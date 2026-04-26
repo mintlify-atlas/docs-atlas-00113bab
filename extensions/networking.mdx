@@ -1,0 +1,128 @@
+---
+title: "Networking PHP extensions: SSH2, IMAP, HTTP"
+description: "Reference for PHP networking extensions including SSH2, IMAP, pecl_http, event, oauth, gnupg, uuid, mailparse, maxminddb, and opentelemetry."
+---
+
+PHP's networking extension ecosystem covers everything from low-level SSH connections and mail processing to distributed tracing and GeoIP lookups. The extensions documented here are available through the `shivammathur/extensions` tap and cover the most common networking and protocol integration needs.
+
+## ssh2
+
+The ssh2 extension wraps [libssh2](https://libssh2.org/) to provide SSH, SFTP, and SCP functionality from PHP. You can use it to execute remote commands, transfer files over SFTP, or tunnel connections through an SSH channel.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/ssh2@8.4
+```
+
+## imap
+
+The imap extension provides functions for connecting to IMAP and POP3 mailboxes. It is built against the `imap-uw` library and supports SSL connections, mailbox management, and message parsing.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/imap@8.4
+```
+
+## pecl_http
+
+The `pecl_http` extension (also known as `ext-http`) provides a full-featured HTTP client and server message API. It supports request building, response parsing, chunked transfer encoding, and persistent connections, and is lower-level than userland HTTP libraries like Guzzle.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/pecl_http@8.4
+```
+
+<Note>
+  `pecl_http` depends on `raphf`. Install `raphf` first, then `pecl_http`, and load `raphf.so` before `http.so` in your `php.ini`.
+</Note>
+
+## raphf
+
+raphf is a reusable persistent handles and resources framework that `pecl_http` depends on. If you only need raphf as a dependency for `pecl_http`, installing `pecl_http` will pull it in. You can also install it standalone if another extension requires it.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/raphf@8.4
+```
+
+## event
+
+The event extension provides bindings for [libevent](https://libevent.org/), an event notification library. It enables non-blocking I/O, timers, and signal handling, which are useful for long-running PHP processes and custom server implementations.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/event@8.4
+```
+
+## oauth
+
+The oauth extension implements the OAuth 1.0 protocol on both the consumer and provider sides. It handles request signing, token exchange, and nonce management, which is useful when integrating with APIs that have not migrated to OAuth 2.0.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/oauth@8.4
+```
+
+## gnupg
+
+The gnupg extension wraps [GPGME](https://gnupg.org/software/gpgme/index.html) to allow PHP to encrypt, decrypt, sign, and verify data using GnuPG. It is commonly used for PGP-signed email delivery and encrypted file storage.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/gnupg@8.4
+```
+
+## uuid
+
+The uuid extension generates and parses UUIDs (versions 1 through 5) using the [OSSP uuid](http://www.ossp.org/pkg/lib/uuid/) library. It is useful when you need RFC 4122-compliant UUIDs generated in C rather than in PHP userland.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/uuid@8.4
+```
+
+## mailparse
+
+The mailparse extension parses RFC 2822 and MIME email messages. It is designed for high-performance mail processing and can handle large message archives without loading the full message into memory.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/mailparse@8.4
+```
+
+## maxminddb
+
+The maxminddb extension reads MaxMind DB files, which are used for IP geolocation and related lookups. It provides fast lookups against `.mmdb` database files such as GeoLite2 and GeoIP2.
+
+**PHP version range:** PHP 7.2 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/maxminddb@8.4
+```
+
+<Info>
+  You must download a MaxMind DB file separately. The free GeoLite2 databases are available from [MaxMind's website](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data) after registering for an account.
+</Info>
+
+## opentelemetry
+
+The opentelemetry extension is the C-level auto-instrumentation layer for the [OpenTelemetry PHP SDK](https://opentelemetry.io/docs/languages/php/). It hooks into PHP's observer API to emit traces and metrics with minimal overhead, without requiring manual instrumentation calls throughout application code.
+
+**PHP version range:** PHP 8.0 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/opentelemetry@8.4
+```
+
+<Tip>
+  The opentelemetry extension provides the low-level hooks. You still need to install the `open-telemetry/opentelemetry` Composer package and configure an exporter (OTLP, Jaeger, Zipkin, etc.) to collect and export telemetry data.
+</Tip>

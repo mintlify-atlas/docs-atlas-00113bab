@@ -1,0 +1,89 @@
+---
+title: "Upgrading PHP extensions with Homebrew"
+description: "Keep your PHP extensions up to date by upgrading individual formulae or all extensions at once, and learn when to restart your webserver afterwards."
+---
+
+Upgrading an extension installs the latest pre-built bottle available for your PHP version and platform. Always run `brew update` first so Homebrew knows about the newest formula revisions before attempting an upgrade.
+
+## Update Homebrew
+
+Fetch the latest formula metadata before upgrading:
+
+```zsh
+brew update
+```
+
+Skipping this step can result in Homebrew attempting to upgrade to an outdated version, or failing to find a newer bottle entirely.
+
+## Upgrade a single extension
+
+Pass the tap-qualified formula name to upgrade a specific extension. For example, to upgrade Xdebug on PHP 8.4:
+
+```zsh
+brew upgrade shivammathur/extensions/xdebug@8.4
+```
+
+Replace `xdebug` and `8.4` with the extension name and PHP version you want to update.
+
+### More examples
+
+<CodeGroup>
+
+```zsh Memcached on PHP 8.4
+brew upgrade shivammathur/extensions/memcached@8.4
+```
+
+```zsh Imagick on PHP 8.4
+brew upgrade shivammathur/extensions/imagick@8.4
+```
+
+```zsh Redis (phpredis) on PHP 8.4
+brew upgrade shivammathur/extensions/redis@8.4
+```
+
+</CodeGroup>
+
+## Upgrade all extensions at once
+
+To upgrade every outdated formula from this tap in one command, run `brew upgrade` without specifying a formula:
+
+```zsh
+brew upgrade
+```
+
+<Warning>
+  Running `brew upgrade` with no arguments upgrades **all** outdated Homebrew formulae, not just PHP extensions. If you want to limit upgrades to a specific set, list each formula explicitly or use `--greedy` with a formula name pattern.
+</Warning>
+
+## After upgrading
+
+### Verify the new version
+
+Confirm PHP is loading the updated extension:
+
+```zsh
+php -m
+```
+
+For version-specific information on an extension such as Xdebug, check the output of:
+
+```zsh
+php -r "echo phpversion('xdebug');"
+```
+
+### Restart your webserver
+
+If you run PHP through Apache or Nginx with PHP-FPM, the running PHP-FPM process holds the old extension in memory until it is restarted. See the webserver setup page for the exact restart commands.
+
+<Note>
+  CLI usage (running `php` directly in a terminal) does not require a restart. Each invocation loads the current extension from disk automatically.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Webserver setup" icon="server" href="/usage/webserver-setup">
+    Restart Apache, Nginx, or PHP-FPM to load the upgraded extension.
+  </Card>
+  <Card title="Installing extensions" icon="download" href="/usage/installing-extensions">
+    Install a new extension for the first time.
+  </Card>
+</CardGroup>

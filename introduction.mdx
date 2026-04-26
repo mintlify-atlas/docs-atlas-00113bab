@@ -1,0 +1,48 @@
+---
+title: "Pre-built PHP extensions for Homebrew, PHP 5.6–8.6"
+description: "A Homebrew tap providing 60+ pre-built PHP extensions for macOS and Linux, covering every PHP version from 5.6 through 8.6 with fast binary bottles."
+---
+
+`shivammathur/homebrew-extensions` is a Homebrew tap that delivers pre-built formulae for PHP extensions spanning PHP 5.6 through 8.6. Instead of compiling extensions from source, you get binary bottles distributed via the GitHub Container Registry (`ghcr.io`), making installs fast and repeatable on both macOS and Linux. The tap is designed to pair with either `homebrew/core` or the companion [`shivammathur/php`](https://github.com/shivammathur/homebrew-php) tap, so you can install a specific PHP version and its extensions side-by-side with a consistent `brew install` workflow.
+
+## Why this tap exists
+
+The official `homebrew/core` tap ships only a small subset of PHP extensions. Compiling extensions yourself through PECL requires matching build toolchains and is fragile across OS upgrades. This tap solves both problems: every extension formula is built and tested against each supported PHP version on every supported platform, and the resulting bottles are published to a container registry so your machine downloads a ready-to-run binary rather than building anything locally.
+
+## Supported PHP versions
+
+Formulae are available for **PHP 5.6 through PHP 8.6**. Each extension formula targets a specific PHP version using the `@<version>` suffix convention — for example, `xdebug@8.4` installs Xdebug for PHP 8.4.
+
+## Key extensions available
+
+Over 60 extensions are available, including widely used ones across every major category:
+
+| Category | Extensions |
+|---|---|
+| Debugging & profiling | `xdebug`, `pcov`, `xhprof`, `spx`, `vld` |
+| Caching | `apcu`, `redis`, `memcached`, `memcache` |
+| Messaging & queues | `amqp`, `rdkafka`, `zmq`, `grpc` |
+| Databases | `mongodb`, `pdo_sqlsrv`, `sqlsrv`, `couchbase` |
+| Imaging | `imagick`, `gmagick`, `vips` |
+| Serialization | `igbinary`, `msgpack`, `protobuf` |
+| Async & concurrency | `swoole`, `swow`, `event` |
+| Frameworks | `phalcon3`, `phalcon4`, `phalcon5` |
+
+## Relationship to shivammathur/php
+
+The [`shivammathur/php`](https://github.com/shivammathur/homebrew-php) tap provides PHP itself — every version from 5.6 through 8.6 — while this tap provides the extensions that run on top of those PHP builds. You do not need to use `shivammathur/php` to use this tap; extensions also work with PHP from `homebrew/core`. However, if you need a specific or older PHP version that `homebrew/core` no longer ships, `shivammathur/php` is the recommended companion.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Add the tap and install your first PHP extension in minutes.
+  </Card>
+  <Card title="Extension reference" icon="puzzle-piece" href="/extensions/overview">
+    Browse all 60+ available extensions organized by category.
+  </Card>
+  <Card title="Platform support" icon="laptop" href="/os-support">
+    See which macOS and Linux platforms and architectures are supported.
+  </Card>
+  <Card title="shivammathur/php" icon="php" href="https://github.com/shivammathur/homebrew-php">
+    Install PHP 5.6–8.6 using the companion Homebrew tap.
+  </Card>
+</CardGroup>

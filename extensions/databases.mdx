@@ -1,0 +1,119 @@
+---
+title: "Database PHP extensions: MongoDB, SQL Server"
+description: "Install MongoDB, mongodb1, pdo_sqlsrv, sqlsrv, Couchbase, pdo_firebird, and interbase for PHP 5.6–8.6 via the shivammathur/extensions Homebrew tap."
+---
+
+The `shivammathur/extensions` tap provides pre-built PHP extensions for connecting to several database systems beyond the drivers bundled with PHP itself. This page covers the MongoDB driver in both its current and legacy series, the Microsoft SQL Server drivers, Couchbase, and the Firebird/InterBase family. All formulas target macOS (Intel and Apple Silicon) and Linux x86\_64.
+
+## Prerequisites
+
+Add the tap once and confirm your PHP version is installed before running any install command below:
+
+```zsh
+brew update
+brew tap shivammathur/extensions
+```
+
+## Extensions
+
+<AccordionGroup>
+
+  <Accordion title="mongodb — MongoDB driver (current series)">
+    The `mongodb` extension is the official MongoDB PHP driver maintained by MongoDB, Inc. It exposes a low-level API used by the higher-level `mongodb/mongodb` PHP library and supports BSON, authentication, TLS, and all modern MongoDB server features.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/mongodb@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+
+    The formula depends on `cyrus-sasl`, `icu4c`, `openssl@3`, `snappy`, `zlib`, and `zstd`.
+  </Accordion>
+
+  <Accordion title="mongodb1 — MongoDB driver (1.x legacy series)">
+    `mongodb1` is the 1.x branch of the official MongoDB PHP driver. It is provided separately for codebases that cannot yet migrate to the 2.x series (`mongodb`). This formula only covers the PHP versions current when the 1.x branch was maintained.
+
+    **PHP version range:** PHP 8.1 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/mongodb1@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting (8.1–8.6).
+
+    <Note>
+      For new projects use the `mongodb` formula (2.x series) instead of `mongodb1`.
+    </Note>
+  </Accordion>
+
+  <Accordion title="pdo_sqlsrv — SQL Server PDO driver">
+    `pdo_sqlsrv` is Microsoft's SQL Server driver for PHP's PDO interface. It enables standard PDO-style database access to Microsoft SQL Server and Azure SQL Database.
+
+    **PHP version range:** PHP 7.0 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/pdo_sqlsrv@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+  <Accordion title="sqlsrv — SQL Server non-PDO driver">
+    `sqlsrv` is Microsoft's procedural (non-PDO) SQL Server driver for PHP. It mirrors the `pdo_sqlsrv` feature set but exposes the `sqlsrv_*` function API rather than PDO objects.
+
+    **PHP version range:** PHP 7.0 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/sqlsrv@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+  <Accordion title="couchbase — Couchbase PHP SDK">
+    The `couchbase` extension is the official Couchbase PHP SDK. It provides access to Couchbase Server buckets for key-value operations, N1QL queries, full-text search, and analytics. The formula depends on `libcouchbase`.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/couchbase@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+  <Accordion title="pdo_firebird — Firebird PDO driver">
+    `pdo_firebird` adds Firebird/InterBase database support to PHP's PDO interface. It is compiled from the PHP source tree and links against the Firebird client library.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/pdo_firebird@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+  <Accordion title="interbase — InterBase / Firebird procedural driver">
+    The `interbase` extension provides the older procedural `ibase_*` API for Firebird and InterBase databases. It predates the PDO driver and is included here for compatibility with legacy codebases.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/interbase@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+</AccordionGroup>
+
+## Upgrading
+
+```zsh
+brew upgrade shivammathur/extensions/mongodb@8.4
+```
+
+Substitute the formula name and PHP version as needed.

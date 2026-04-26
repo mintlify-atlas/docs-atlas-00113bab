@@ -1,28 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "homebrew-extensions",
+  "projectType": "general",
+  "projectName": "homebrew-extensions",
+  "projectDescription": "A Homebrew tap providing pre-built PHP extensions for PHP 5.6 through 8.6 on macOS and Linux.",
   "theme": "aspen",
-  "colors": {
-    "primary": "#848c8e",
-    "light": "#11161e",
-    "dark": "#cfd0d2"
-  },
-  "favicon": "https://media.brand.dev/2b01fe20-c04b-4a1d-a2f9-1d2789c50a7a.jpg",
-  "logo": {
-    "light": "https://media.brand.dev/5ffd6ce4-2434-4b4b-920a-f8cacac8b48b.svg",
-    "dark": "https://media.brand.dev/5ffd6ce4-2434-4b4b-920a-f8cacac8b48b.svg"
-  },
-  "navbar": {
-    "primary": {
-      "type": "github",
-      "href": "https://github.com/shivammathur/homebrew-extensions"
-    }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/shivammathur/homebrew-extensions"
-    }
-  },
+  "primaryColor": "#848c8e",
+  "lightColor": "#11161e",
+  "darkColor": "#cfd0d2",
   "navigation": {
     "tabs": [
       {
@@ -83,5 +66,25 @@
         ]
       }
     ]
-  }
+  },
+  "keyFeatures": [
+    "Pre-built PHP extensions for PHP 5.6 to 8.6",
+    "Support for macOS (Intel x86_64 and Apple arm64) and Linux (x86_64)",
+    "60+ PHP extensions including xdebug, redis, imagick, swoole, grpc, and more",
+    "Automated CI/CD builds and bottle publishing via GitHub Actions",
+    "Compatible with both shivammathur/php and homebrew/core PHP taps",
+    "Auto-configures extensions via INI files in PHP conf.d directory"
+  ],
+  "publicApiSurface": [
+    "brew tap shivammathur/extensions",
+    "brew install shivammathur/extensions/<extension>@<php-version>",
+    "brew upgrade shivammathur/extensions/<extension>@<php-version>",
+    "brew uninstall shivammathur/extensions/<extension>@<php-version>",
+    "AbstractPhpExtension — base Ruby class for all extension formulae",
+    "AbstractPhpExtension.init — initializes formula class with PHP version and extension name",
+    "AbstractPhpExtension#safe_phpize — runs phpize with correct autoconf environment",
+    "AbstractPhpExtension#write_config_file — writes extension INI config to PHP conf.d",
+    "AbstractPhpExtension#add_include_files — installs extension header files",
+    "AbstractPhpExtension#patch_spl_symbols — patches SPL symbol references for compatibility"
+  ]
 }

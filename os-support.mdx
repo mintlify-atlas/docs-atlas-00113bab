@@ -1,0 +1,52 @@
+---
+title: "Platform and architecture support"
+description: "Supported operating systems and CPU architectures for shivammathur/homebrew-extensions, including bottle distribution via the GitHub Container Registry."
+---
+
+The `shivammathur/homebrew-extensions` tap provides pre-built binary bottles for the most common macOS and Linux platforms. Bottles are distributed via the GitHub Container Registry at `ghcr.io/shivammathur/extensions`, which means Homebrew downloads a ready-to-run binary rather than compiling from source on your machine. If no bottle exists for your specific platform, Homebrew automatically falls back to building the extension from source.
+
+## Supported platforms
+
+| Operating system | Architecture              |
+|------------------|---------------------------|
+| Linux            | `x86_64`, `arm64`         |
+| macOS Tahoe      | `x86_64`, `arm64`         |
+| macOS Sequoia    | `x86_64`, `arm64`         |
+| macOS Sonoma     | `x86_64`, `arm64`         |
+
+<Note>Apple Silicon Macs (M1 and later) use the `arm64` architecture. Intel Macs use `x86_64`. Pre-built bottles are available for both `x86_64` and `arm64` on Linux and all supported macOS releases.</Note>
+
+## Bottle distribution
+
+Bottles are hosted on the GitHub Container Registry (`ghcr.io`) rather than the default Homebrew bottle CDN. Homebrew resolves this automatically using the `root_url` set in each formula's `bottle` block — you do not need to configure anything manually.
+
+For example, the Xdebug 8.4 formula declares bottles for each supported platform:
+
+```ruby
+bottle do
+  root_url "https://ghcr.io/v2/shivammathur/extensions"
+  sha256                               arm64_tahoe:   "ea7d12a752fdc8df32f2fb8c13902688eb82870829c73b4c12cb2fa7f5e26b40"
+  sha256                               arm64_sequoia: "65f37e02efbcd7434502519db4aba60862e44bfaefd4d084a5b32492fc284b5a"
+  sha256                               arm64_sonoma:  "bfa69cce988ac651b739c71906779096ab564f60053ad287e7820c087def59f0"
+  sha256 cellar: :any_skip_relocation, sonoma:        "8773f76ebce989ae0411672c3319aee172ff843543fefc1cf3ad7fa8d5af651b"
+  sha256                               arm64_linux:   "3315a5b1ea832435a83c2615ce747c48c15269de637b97b7aca618314fdda10e"
+  sha256                               x86_64_linux:  "4b32ee3b98a5f75025e5837c64a48e6c6bdd664c92fc6496ef7d3ad3edea698b"
+end
+```
+
+Each bottle entry includes a SHA-256 checksum so Homebrew can verify integrity after download.
+
+## Source builds
+
+If you are running a platform that does not have a pre-built bottle — for example, an older macOS release not listed above — Homebrew will attempt to compile the extension from source. Source builds require a compatible C/C++ toolchain and the relevant system libraries. Most extension formulae declare their dependencies so Homebrew can install them automatically, but build times will be significantly longer than downloading a bottle.
+
+<Warning>Source builds are not officially tested or supported by this tap. If you encounter a build failure on an unsupported platform, check the [discussions board](https://github.com/shivammathur/homebrew-extensions/discussions) before opening an issue.</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Install your first extension on a supported platform.
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/troubleshooting/debugging">
+    Diagnose common installation failures and permission issues.
+  </Card>
+</CardGroup>

@@ -1,133 +1,83 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+title: "homebrew-extensions: PHP Extensions for Homebrew"
+description: "Install and manage PHP extensions on macOS and Linux using Homebrew. Supports PHP 5.6 through 8.6 with 60+ pre-built binary extensions."
 ---
 
-## Setting up
+`shivammathur/homebrew-extensions` is a Homebrew tap that provides pre-built formulae for PHP extensions covering PHP 5.6 through 8.6. It works alongside the official `homebrew/core` tap or the `shivammathur/php` tap, letting you install extensions like Xdebug, Redis, Imagick, Swoole, gRPC, and many more with a single `brew install` command.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Add the tap and install your first PHP extension in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="OS Support" icon="laptop" href="/os-support">
+    Check which macOS and Linux platforms and architectures are supported.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Extension Reference" icon="puzzle-piece" href="/extensions/overview">
+    Browse all 60+ available PHP extensions organized by category.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Troubleshooting" icon="wrench" href="/troubleshooting/debugging">
+    Diagnose and fix common installation and configuration issues.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Get up and running
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Add the tap">
+    Register the `shivammathur/extensions` tap with Homebrew:
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install an extension">
+    Install any extension by specifying its name and PHP version. For example, Xdebug on PHP 8.4:
 
-## Make your content agent ready
+    ```zsh
+    brew install shivammathur/extensions/xdebug@8.4
+    ```
+  </Step>
+  <Step title="Verify the installation">
+    Confirm the extension is loaded by PHP:
 
-Make your docs work for humans and AI agents alike.
+    ```zsh
+    php -m | grep xdebug
+    ```
+  </Step>
+</Steps>
 
-<Columns cols={2}>
-  <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
-    icon="eye"
-    href="/agent-ready/visibility"
-  >
-    Show different content to humans and agents reading your docs.
-  </Card>
-  <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
-  >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
-  </Card>
-  <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
-  >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
-  </Card>
-</Columns>
+## What's included
 
-## Need inspiration?
+Over 60 PHP extensions are available across all supported PHP versions, including:
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<CardGroup cols={3}>
+  <Card title="Debugging" icon="bug" href="/extensions/profiling-debugging">
+    xdebug, pcov, xhprof, spx, vld
+  </Card>
+  <Card title="Caching" icon="database" href="/extensions/caching">
+    apcu, memcache, memcached, redis
+  </Card>
+  <Card title="Messaging" icon="envelope" href="/extensions/messaging">
+    amqp, rdkafka, zmq, grpc
+  </Card>
+  <Card title="Databases" icon="server" href="/extensions/databases">
+    mongodb, pdo_sqlsrv, sqlsrv, couchbase
+  </Card>
+  <Card title="Imaging" icon="image" href="/extensions/imaging">
+    imagick, gmagick, vips
+  </Card>
+  <Card title="Frameworks" icon="layer-group" href="/extensions/frameworks">
+    phalcon3, phalcon4, phalcon5, swoole, swow
+  </Card>
+</CardGroup>
+
+## Related projects
+
+<CardGroup cols={2}>
+  <Card title="shivammathur/php" icon="php" href="https://github.com/shivammathur/homebrew-php">
+    Homebrew tap for installing PHP itself, versions 5.6 through 8.6.
+  </Card>
+  <Card title="shivammathur/setup-php" icon="github" href="https://github.com/shivammathur/setup-php">
+    GitHub Action for setting up PHP with extensions in CI pipelines.
+  </Card>
+</CardGroup>

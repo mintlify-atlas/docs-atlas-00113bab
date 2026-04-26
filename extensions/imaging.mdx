@@ -1,0 +1,111 @@
+---
+title: "Image processing PHP extensions: Imagick, Vips"
+description: "Install and configure Imagick, Gmagick, and Vips for image manipulation in PHP, including system dependency instructions for macOS and Linux."
+---
+
+PHP offers several C extension bindings for image processing libraries, each with different performance characteristics and feature sets. Imagick and Gmagick wrap the ImageMagick and GraphicsMagick libraries respectively, while Vips binds to libvips, a high-performance image processing library optimized for low memory usage and pipeline execution.
+
+<Warning>
+  `imagick` and `gmagick` conflict with each other — both register overlapping PHP class names and cannot be loaded in the same PHP process. Install only one of them per PHP version.
+</Warning>
+
+## imagick
+
+The imagick extension provides PHP bindings for [ImageMagick](https://imagemagick.org/), one of the most widely used image manipulation toolkits. It supports over 200 image formats and exposes format conversion, compositing, drawing, color management, and filter operations through an object-oriented API.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+**System dependency:** `imagemagick`
+
+<Steps>
+  <Step title="Install the ImageMagick system library">
+    ```zsh
+    brew install imagemagick
+    ```
+  </Step>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install imagick for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/imagick@8.4
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  After installation, verify the extension is loaded with `php -r "echo (new Imagick())->getVersion()['versionString'];"`. This confirms both the extension and the underlying ImageMagick library are linked correctly.
+</Tip>
+
+## gmagick
+
+The gmagick extension provides PHP bindings for [GraphicsMagick](http://www.graphicsmagick.org/), a fork of ImageMagick focused on stability and performance. GraphicsMagick is generally faster than ImageMagick for batch processing, though it supports a narrower set of formats and has a smaller community.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+**System dependency:** `graphicsmagick`
+
+<Steps>
+  <Step title="Install the GraphicsMagick system library">
+    ```zsh
+    brew install graphicsmagick
+    ```
+  </Step>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install gmagick for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/gmagick@8.4
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  gmagick uses a different API class (`Gmagick`) from imagick (`Imagick`). The two APIs are not drop-in compatible with each other, so switching between them requires code changes.
+</Note>
+
+## vips
+
+The vips extension provides PHP bindings for [libvips](https://www.libvips.org/), a demand-driven image processing library. libvips processes images as pipelines, loading only the portions of an image needed at any given time. This makes it significantly faster and more memory-efficient than ImageMagick or GraphicsMagick for operations on large images.
+
+**PHP version range:** PHP 7.0 to PHP 8.6
+
+**System dependency:** `vips`
+
+<Steps>
+  <Step title="Install the libvips system library">
+    ```zsh
+    brew install vips
+    ```
+  </Step>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install vips for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/vips@8.4
+    ```
+  </Step>
+</Steps>
+
+<Info>
+  The vips extension works alongside the [php-vips](https://github.com/libvips/php-vips) Composer package, which provides a higher-level object-oriented API on top of the low-level extension. Install both the extension and the Composer package for the best developer experience.
+</Info>
+
+## Comparison
+
+| Extension | Underlying library | Format support | Relative speed | Best for |
+|-----------|-------------------|---------------|----------------|----------|
+| imagick | ImageMagick | 200+ formats | Moderate | General-purpose image manipulation |
+| gmagick | GraphicsMagick | Common formats | Faster batch | Batch processing, stability-focused |
+| vips | libvips | Common formats | Fastest | Large images, memory-constrained environments |

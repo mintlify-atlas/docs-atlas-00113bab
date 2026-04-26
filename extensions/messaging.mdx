@@ -1,0 +1,97 @@
+---
+title: "Messaging and RPC PHP extensions"
+description: "Install amqp, grpc, rdkafka, zmq, and protobuf for PHP 5.6–8.6 via the shivammathur/extensions tap to connect PHP with message brokers and RPC systems."
+---
+
+Modern PHP applications often need to communicate with message brokers, streaming platforms, or remote procedure call frameworks. The `shivammathur/extensions` tap provides pre-built bottles for five extensions covering the most common messaging and RPC scenarios: AMQP for RabbitMQ-compatible brokers, gRPC for Google's RPC framework, rdkafka for Apache Kafka, ZeroMQ for socket-based messaging patterns, and Protocol Buffers for language-neutral serialisation.
+
+## Prerequisites
+
+Add the tap once and confirm your PHP version is installed before running any install command below:
+
+```zsh
+brew update
+brew tap shivammathur/extensions
+```
+
+## Extensions
+
+<AccordionGroup>
+
+  <Accordion title="amqp — AMQP / RabbitMQ client">
+    The `amqp` extension implements the Advanced Message Queuing Protocol (AMQP 0-9-1) used by RabbitMQ and other compatible brokers. It is built on the `rabbitmq-c` C library and exposes PHP classes for connections, channels, exchanges, queues, and message publishing/consuming.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/amqp@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting. The formula depends on `rabbitmq-c`.
+  </Accordion>
+
+  <Accordion title="grpc — Google gRPC">
+    The `grpc` extension is the official PHP binding for Google's gRPC framework. It enables PHP services to act as gRPC clients (and, with additional tooling, servers) using Protocol Buffers or other serialisation formats over HTTP/2.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/grpc@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting. The formula depends on the `grpc` Homebrew formula from homebrew/core.
+
+    <Tip>
+      The `grpc` extension is commonly paired with the `protobuf` extension and the `grpc/grpc` Composer package for full gRPC client support.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="rdkafka — Apache Kafka client">
+    `rdkafka` wraps the `librdkafka` C/C++ library to give PHP applications producer and consumer access to Apache Kafka topics. It supports both the low-level and high-level consumer APIs.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/rdkafka@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting. The formula depends on `librdkafka`.
+  </Accordion>
+
+  <Accordion title="zmq — ZeroMQ">
+    The `zmq` extension binds the ZeroMQ (ØMQ) asynchronous messaging library to PHP. ZeroMQ provides socket patterns such as request-reply, publish-subscribe, push-pull, and dealer-router without requiring a broker.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/zmq@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting. The formula depends on `zeromq` and `czmq`.
+  </Accordion>
+
+  <Accordion title="protobuf — Protocol Buffers">
+    The `protobuf` extension provides a C implementation of Protocol Buffers serialisation and deserialisation for PHP, used as a faster alternative to the pure-PHP runtime when working with gRPC or any other protobuf-encoded data.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/protobuf@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting. The formula depends on `protobuf-c`.
+
+    <Note>
+      The C extension (`protobuf`) is significantly faster than the pure-PHP implementation shipped with the `google/protobuf` Composer package. Install both; the runtime will prefer the C extension when it is loaded.
+    </Note>
+  </Accordion>
+
+</AccordionGroup>
+
+## Upgrading
+
+```zsh
+brew upgrade shivammathur/extensions/amqp@8.4
+```
+
+Substitute the formula name and PHP version as needed.

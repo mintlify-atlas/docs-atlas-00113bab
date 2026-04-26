@@ -1,81 +1,110 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
-icon: 'rocket'
+title: "Get started with homebrew-extensions"
+description: "Add the shivammathur/extensions tap and install a PHP extension on macOS or Linux in minutes, with pre-built bottles for PHP 5.6 through 8.6."
 ---
 
-## Get started in three steps
+This guide walks you through adding the `shivammathur/extensions` tap to Homebrew and installing a PHP extension. The example below uses Xdebug on PHP 8.4, but the same steps apply to any of the 60+ extensions and any supported PHP version from 5.6 through 8.6.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Update Homebrew">
+    Before installing anything, update Homebrew and its formulae to ensure you get the latest bottles:
 
-### Step 1: Set up your local environment
+    ```zsh
+    brew update
+    ```
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    <Tip>Running `brew update` before every install avoids stale formula definitions that can cause build failures or unexpected dependency versions.</Tip>
+  </Step>
 
-### Step 2: Deploy your changes
+  <Step title="Check that PHP is installed">
+    Verify that the PHP version you need is already installed:
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```zsh
+    php -v
+    ```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    If PHP is installed, you will see the version printed to the terminal. If it is not installed, or if you need a specific version that `homebrew/core` no longer ships, install it using the `shivammathur/php` tap:
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```zsh
+    brew tap shivammathur/php
+    brew install shivammathur/php/php@8.4
+    brew link --force --overwrite shivammathur/php/php@8.4
+    ```
 
-### Step 3: Go live
+    <Note>Extensions from this tap work with PHP installed from either `homebrew/core` or `shivammathur/php`. See [shivammathur/homebrew-php](https://github.com/shivammathur/homebrew-php) for the full list of available PHP versions.</Note>
+  </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Add the extensions tap">
+    Register the `shivammathur/extensions` tap with Homebrew:
 
-## Next steps
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
 
-Now that you have your docs running, explore these key features:
+    This adds the tap's formulae to your local Homebrew index. You only need to run this once.
+  </Step>
+
+  <Step title="Install an extension">
+    Install the extension you need by specifying its name and PHP version suffix. For example, to install Xdebug for PHP 8.4:
+
+    ```zsh
+    brew install shivammathur/extensions/xdebug@8.4
+    ```
+
+    Homebrew downloads a pre-built bottle from the GitHub Container Registry (`ghcr.io`) and writes a configuration file to your PHP `conf.d` directory automatically. No manual `.ini` editing is required.
+
+    To install a different extension or target a different PHP version, replace `xdebug` and `8.4` with the extension name and version you need — for example, `redis@8.3` or `imagick@7.4`.
+  </Step>
+
+  <Step title="Verify the extension is loaded">
+    Confirm PHP has picked up the new extension:
+
+    ```zsh
+    php -m | grep xdebug
+    ```
+
+    If the extension is loaded, its name appears in the output. You can also list all loaded extensions at once:
+
+    ```zsh
+    php -m
+    ```
+  </Step>
+
+  <Step title="Restart your web server (if applicable)">
+    If you are serving PHP through Apache or Nginx with `php-fpm`, restart the web server to apply the new extension:
+
+    <Tabs>
+      <Tab title="Apache">
+        ```zsh
+        brew services restart httpd
+        ```
+      </Tab>
+      <Tab title="Nginx">
+        ```zsh
+        brew services restart nginx
+        ```
+      </Tab>
+    </Tabs>
+
+    <Note>This step is only needed if you are running a web server. CLI usage (`php -m`, running scripts) does not require a restart.</Note>
+  </Step>
+</Steps>
+
+## Upgrading an extension
+
+To upgrade an installed extension to the latest version, use `brew upgrade` with the same formula name:
+
+```zsh
+brew upgrade shivammathur/extensions/xdebug@8.4
+```
+
+After upgrading, restart your web server if you are running one (see step 6 above).
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Extension reference" icon="puzzle-piece" href="/extensions/overview">
+    Browse all available extensions and the PHP versions they support.
+  </Card>
+  <Card title="Platform support" icon="laptop" href="/os-support">
+    See which macOS and Linux platforms have pre-built bottles.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

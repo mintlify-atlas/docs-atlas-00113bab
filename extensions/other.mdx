@@ -1,0 +1,62 @@
+---
+title: "Additional PHP extensions reference"
+description: "Quick reference for PHP extensions including ast, brotli, decimal, yaml, zstd, xlswriter, seaslog, mcrypt, gearman, uopz, uploadprogress, pinba, and more."
+---
+
+This page covers PHP extensions that do not fit neatly into the caching, database, serialization, networking, imaging, or framework categories. Each entry includes a brief description, the supported PHP version range, and the install command pattern. Replace the version suffix (for example, `@8.4`) with your target PHP version.
+
+<Info>
+  All extensions require the tap to be added first. Run `brew tap shivammathur/extensions` once before installing any extension listed here.
+</Info>
+
+## Extension table
+
+| Extension | Description | PHP version range | Install command |
+|-----------|-------------|-------------------|-----------------|
+| `ast` | Exposes PHP's internal abstract syntax tree via a `ast\Node` API, used by static analysis tools like Phan | PHP 7.0–8.6 | `brew install shivammathur/extensions/ast@8.4` |
+| `brotli` | Adds Brotli compression and decompression functions; useful for compressing HTTP responses at the PHP level | PHP 5.6–8.6 | `brew install shivammathur/extensions/brotli@8.4` |
+| `decimal` | Arbitrary-precision decimal arithmetic using `libmpdec`; avoids floating-point rounding errors in financial calculations | PHP 7.0–8.6 | `brew install shivammathur/extensions/decimal@8.4` |
+| `event` | Bindings for libevent; provides non-blocking I/O, timers, and signal handling for long-running PHP processes | PHP 5.6–8.6 | `brew install shivammathur/extensions/event@8.4` |
+| `excimer` | Low-overhead sampling profiler that generates flamegraph-compatible output; suitable for production profiling | PHP 7.1–8.6 | `brew install shivammathur/extensions/excimer@8.4` |
+| `expect` | Wraps the `expect` library to automate interactive terminal programs from PHP | PHP 5.6–8.6 | `brew install shivammathur/extensions/expect@8.4` |
+| `gearman` | Client and worker interface for the Gearman job server; used for distributing background tasks across servers | PHP 5.6–8.6 | `brew install shivammathur/extensions/gearman@8.4` |
+| `lua` | Embeds a Lua interpreter in PHP for evaluating Lua scripts and exchanging values between the two runtimes | PHP 5.6–7.4 | `brew install shivammathur/extensions/lua@7.4` |
+| `mcrypt` | Provides symmetric encryption using `libmcrypt`; note that mcrypt has been unmaintained since 2007 | PHP 5.6–8.6 | `brew install shivammathur/extensions/mcrypt@8.4` |
+| `pinba` | Sends request timing and statistics to a Pinba MySQL storage engine for real-time PHP performance monitoring | PHP 7.0–8.6 | `brew install shivammathur/extensions/pinba@8.4` |
+| `propro` | Reusable property proxy framework; a low-level dependency used by `pecl_http` | PHP 5.6–7.4 | `brew install shivammathur/extensions/propro@7.4` |
+| `psr` | Provides PHP-FIG PSR interface stubs as a C extension so other extensions can declare PSR type compatibility | PHP 5.6–8.6 | `brew install shivammathur/extensions/psr@8.4` |
+| `raphf` | Reusable persistent handles framework; required by `pecl_http` and must be loaded before it | PHP 5.6–8.6 | `brew install shivammathur/extensions/raphf@8.4` |
+| `rdkafka` | PHP client for Apache Kafka based on `librdkafka`; supports producing and consuming messages with full consumer group support | PHP 5.6–8.6 | `brew install shivammathur/extensions/rdkafka@8.4` |
+| `seaslog` | High-performance logging extension with log level filtering, buffering, and configurable appenders | PHP 5.6–8.6 | `brew install shivammathur/extensions/seaslog@8.4` |
+| `snmp` | SNMP client for querying network devices; wraps `net-snmp` | PHP 5.6–8.3 | `brew install shivammathur/extensions/snmp@8.3` |
+| `spx` | Simple profiling extension with a web UI; records call counts, inclusive/exclusive times, and memory usage without code changes | PHP 5.6–8.6 | `brew install shivammathur/extensions/spx@8.4` |
+| `uopz` | User Operations for Zend Engine; allows replacing and intercepting functions and methods at runtime, primarily for testing | PHP 5.6–8.6 | `brew install shivammathur/extensions/uopz@8.4` |
+| `uploadprogress` | Tracks the progress of file uploads in real time, exposing upload state to polling AJAX requests | PHP 5.6–8.6 | `brew install shivammathur/extensions/uploadprogress@8.4` |
+| `vld` | Vulcan Logic Disassembler; dumps the opcode stream PHP generates for a script, used for understanding compilation and optimization | PHP 5.6–8.3 | `brew install shivammathur/extensions/vld@8.3` |
+| `xlswriter` | High-performance Excel (`.xlsx`) writer based on `libxlsxwriter`; suitable for generating large spreadsheets without memory issues | PHP 7.0–8.6 | `brew install shivammathur/extensions/xlswriter@8.4` |
+| `yaml` | Parses and emits YAML using `libyaml`; supports YAML 1.1 and is faster than pure-PHP YAML parsers | PHP 5.6–8.6 | `brew install shivammathur/extensions/yaml@8.4` |
+| `zmq` | PHP bindings for ZeroMQ, a high-performance asynchronous messaging library supporting push/pull, pub/sub, and request/reply patterns | PHP 5.6–8.6 | `brew install shivammathur/extensions/zmq@8.4` |
+| `zstd` | Zstandard compression and decompression; offers better compression ratios than gzip at comparable or faster speeds | PHP 7.0–8.6 | `brew install shivammathur/extensions/zstd@8.4` |
+
+## Version-limited extensions
+
+Several extensions have an upper PHP version boundary that is lower than the current PHP release. Take note of these before installing:
+
+<AccordionGroup>
+  <Accordion title="lua — PHP 5.6 to 7.4 only">
+    The lua extension has not been updated for PHP 8.x. If you need Lua scripting in PHP 8+, consider running Lua as a subprocess or via a different integration.
+  </Accordion>
+  <Accordion title="propro — PHP 5.6 to 7.4 only">
+    propro is a dependency of older `pecl_http` releases. On PHP 8.x, `pecl_http` no longer requires propro.
+  </Accordion>
+  <Accordion title="snmp — PHP 5.6 to 8.3 only">
+    The snmp extension formula is not yet available for PHP 8.4 and later in this tap. Use `php@8.3` or earlier for SNMP functionality.
+  </Accordion>
+  <Accordion title="vld — PHP 5.6 to 8.3 only">
+    The vld extension formula is not yet available for PHP 8.4 and later. Use `php@8.3` or earlier for opcode inspection.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  Always run `brew update` before installing an extension to ensure your local formula cache is current. Installing from an outdated cache may pull an older version of the formula.
+</Warning>

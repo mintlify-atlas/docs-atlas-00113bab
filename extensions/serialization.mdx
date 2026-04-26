@@ -1,0 +1,86 @@
+---
+title: "Serialization PHP extensions: igbinary, msgpack"
+description: "Install and configure igbinary, msgpack, and protobuf for efficient binary serialization in PHP applications, from PHP 5.6 through 8.6."
+---
+
+Binary serialization extensions replace PHP's default `serialize()` format with more compact, faster alternatives. These extensions are especially useful for caching layers, message queues, and inter-process communication where payload size and parse speed matter.
+
+## igbinary
+
+igbinary is a drop-in replacement for PHP's built-in serializer. It produces a compact binary representation rather than a human-readable string, which reduces storage size and speeds up serialization and deserialization. It is widely used as the serializer for phpredis and php-memcached, where smaller payloads reduce network overhead.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+<Steps>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install igbinary for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/igbinary@8.4
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  After installing igbinary, configure phpredis to use it as its serializer by adding `extension=igbinary.so` before `extension=redis.so` in your `php.ini`, then set `redis.serialize = igbinary`.
+</Tip>
+
+## msgpack
+
+msgpack implements the [MessagePack](https://msgpack.org/) binary serialization format for PHP. MessagePack is a cross-language format designed to be faster and smaller than JSON, making it a good choice when exchanging structured data between PHP and other services such as Go, Rust, or Python microservices.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+<Steps>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install msgpack for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/msgpack@8.4
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  msgpack and igbinary serve similar purposes. If your stack is PHP-only, igbinary is often the simpler choice. If you need to share serialized data with non-PHP services, msgpack's cross-language support makes it more practical.
+</Note>
+
+## protobuf
+
+protobuf provides PHP bindings for Google's [Protocol Buffers](https://protobuf.dev/). Unlike igbinary and msgpack, protobuf uses a schema-defined format (`.proto` files), making it well-suited for typed RPC systems and APIs where a strict contract between services is required. It is the serialization layer used by gRPC.
+
+**PHP version range:** PHP 5.6 to PHP 8.6
+
+<Steps>
+  <Step title="Add the tap">
+    ```zsh
+    brew tap shivammathur/extensions
+    ```
+  </Step>
+  <Step title="Install protobuf for your PHP version">
+    Replace `8.4` with your target PHP version:
+    ```zsh
+    brew install shivammathur/extensions/protobuf@8.4
+    ```
+  </Step>
+</Steps>
+
+<Info>
+  The protobuf extension works alongside the [`grpc`](/extensions/messaging) extension when building gRPC-based PHP services. Install both extensions and generate PHP stubs from your `.proto` files using `protoc`.
+</Info>
+
+## Comparison
+
+| Extension | Format | Cross-language | Schema required | Common use case |
+|-----------|--------|---------------|-----------------|-----------------|
+| igbinary | Binary (PHP-specific) | No | No | Redis/Memcached serializer |
+| msgpack | MessagePack | Yes | No | Mixed-language message queues |
+| protobuf | Protocol Buffers | Yes | Yes | gRPC, typed service contracts |

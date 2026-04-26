@@ -1,0 +1,195 @@
+---
+title: "PHP extension formula structure explained"
+description: "Understand AbstractPhpExtension, how class names encode the PHP version, the priority system, and every helper method used inside a formula."
+---
+
+Every formula in this tap inherits from `AbstractPhpExtension`, a custom base class defined in `Abstract/abstract-php-extension.rb`. The base class handles the repetitive machinery of a PHP extension build — running `phpize`, writing the `.ini` configuration file, installing headers — so that individual formula files only need to describe what is unique about each extension. Understanding what the base class provides makes it much easier to read, write, and debug formulae.
+
+## Class naming convention
+
+The class name encodes both the extension name and the PHP version in a single identifier. The pattern is:
+
+```
+<ExtensionName>AT<MajorMinor> < AbstractPhpExtension
+```
+
+For example, `XdebugAT84` means the xdebug extension for PHP 8.4. The `init` class method parses this name at load time using the regex `/(\w+)AT(\d)(\d)/` to extract `@extension` and `@php_version`:
+
+```ruby
+def init
+  class_name = name.split("::").last
+  matches = /(\w+)AT(\d)(\d)/.match(class_name)
+  @extension = parse_extension matches
+  @php_version = "#{matches[2]}.#{matches[3]}" if matches
+  depends_on "autoconf" => :build
+  depends_on "pkgconf" => :build
+  depends_on "shivammathur/php/php@#{@php_version}" => [:build, :test]
+end
+```
+
+Calling `init` at the top of a formula class is mandatory — it wires up the build dependencies and makes `extension` and `php_version` available throughout the formula.
+
+## The priority system
+
+The `.ini` file written to PHP's `conf.d` directory is named `<priority>-<extension>.ini`. The default priority is `"20"`. You can override it in a formula by calling the `priority` class method before `install`:
+
+```ruby
+priority "30"
+```
+
+`memcached@8.4.rb` uses priority `"30"` because it must load after `igbinary` and `msgpack` (priority `"20"`), which it depends on. Choose a higher number when your extension requires another extension to already be loaded.
+
+## Helper methods
+
+<AccordionGroup>
+  <Accordion title="safe_phpize">
+    Runs `phpize` for the correct PHP version, with explicit environment variables pointing to the Homebrew-managed `autoconf`:
+
+    ```ruby
+    def safe_phpize
+      ENV["PHP_AUTOCONF"] = "#{Formula["autoconf"].opt_bin}/autoconf"
+      ENV["PHP_AUTOHEADER"] = "#{Formula["autoconf"].opt_bin}/autoheader"
+      system "#{Formula[php_formula].opt_bin}/phpize"
+    end
+    ```
+
+    Always call `safe_phpize` instead of invoking `phpize` directly. Without the `PHP_AUTOCONF` override, builds can pick up a system `autoconf` that is incompatible with the PHP version being targeted.
+  </Accordion>
+
+  <Accordion title="phpconfig">
+    Returns the `--with-php-config=` flag string that points `./configure` at the right `php-config` binary:
+
+    ```ruby
+    def phpconfig
+      "--with-php-config=#{Formula[php_formula].opt_bin}/php-config"
+    end
+    ```
+
+    Pass it directly to the `system "./configure"` call:
+
+    ```ruby
+    system "./configure", "--prefix=#{prefix}", phpconfig, "--enable-xdebug"
+    ```
+  </Accordion>
+
+  <Accordion title="write_config_file">
+    Removes any existing `.ini` files matching `*<extension>*.ini` in PHP's `conf.d` directory, then writes a fresh configuration file at `<priority>-<extension>.ini`:
+
+    ```ruby
+    def write_config_file
+      Dir[config_scandir_path / "*#{extension}*.ini"].each do |ini_file|
+        rm ini_file
+      end
+      config_scandir_path.mkpath
+      config_filepath.write(config_file_content)
+    end
+    ```
+
+    The file path resolves to `etc/php/<php_version>/conf.d/<priority>-<extension>.ini`. The contents follow this format:
+
+    ```ini
+    [xdebug]
+    zend_extension="/opt/homebrew/opt/xdebug@8.4/xdebug.so"
+    ```
+
+    For most extensions the directive is `extension=`; for xdebug it is `zend_extension=` (see `extension_type` below).
+  </Accordion>
+
+  <Accordion title="extension_type">
+    Returns the correct INI directive name for the extension:
+
+    ```ruby
+    def extension_type
+      if extension == "xdebug"
+        "zend_extension"
+      else
+        "extension"
+      end
+    end
+    ```
+
+    Zend extensions hook into the Zend Engine at a lower level than ordinary PHP extensions and must be loaded with `zend_extension=`. Only xdebug requires this treatment in this tap.
+  </Accordion>
+
+  <Accordion title="add_include_files">
+    Installs any `.h` header files found in the build directory into the Homebrew include tree, namespaced by extension and PHP version:
+
+    ```ruby
+    def add_include_files
+      files = Dir["*.h"]
+      (include/"php/ext/#{extension}@#{php_version}").install files unless files.empty?
+    end
+    ```
+
+    This makes the headers available to other extensions that depend on this one. `memcached@8.4.rb`, for example, symlinks igbinary and msgpack headers into its build directory before running `./configure`.
+  </Accordion>
+
+  <Accordion title="patch_spl_symbols">
+    Replaces `spl_ce_*` symbol references with their `zend_ce_*` equivalents across all source files:
+
+    ```ruby
+    def patch_spl_symbols
+      %w[Aggregate ArrayAccess Countable Iterator Serializable Stringable Traversable].each do |s|
+        files = Dir["**/*"].select { |f| File.file?(f) && File.read(f).scrub.include?("spl_ce_#{s}") }
+        inreplace files, "spl_ce_#{s}", "zend_ce_#{s}".downcase unless files.empty?
+      end
+    end
+    ```
+
+    PHP 8 moved these interface-pointer globals from the SPL extension into the Zend core under new names. Extensions written for PHP 7 that reference `spl_ce_Countable` (for example) will fail to compile on PHP 8 without this substitution. Call `patch_spl_symbols` inside `install` before running `safe_phpize` when porting an older extension.
+  </Accordion>
+</AccordionGroup>
+
+## Complete formula example
+
+The following is the full source of `xdebug@8.4.rb`. It demonstrates a real-world formula that uses `inreplace` to patch an incompatible header path before building, adds a Linux-only dependency, and deliberately omits `add_include_files` because xdebug does not expose public headers.
+
+```ruby
+# typed: true
+# frozen_string_literal: true
+
+require File.expand_path("../Abstract/abstract-php-extension", __dir__)
+
+# Class for Xdebug Extension
+class XdebugAT84 < AbstractPhpExtension
+  init
+  desc "Xdebug PHP extension"
+  homepage "https://github.com/xdebug/xdebug"
+  url "https://github.com/xdebug/xdebug/archive/3.5.1.tar.gz"
+  sha256 "8fd5908d881a588688bd224c7e603212405fa700dc50513d0d366141c27cc78a"
+  head "https://github.com/xdebug/xdebug.git", branch: "master"
+  license "PHP-3.0"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
+  bottle do
+    root_url "https://ghcr.io/v2/shivammathur/extensions"
+    sha256                               arm64_tahoe:   "ea7d12a752fdc8df32f2fb8c13902688eb82870829c73b4c12cb2fa7f5e26b40"
+    sha256                               arm64_sequoia: "65f37e02efbcd7434502519db4aba60862e44bfaefd4d084a5b32492fc284b5a"
+    sha256                               arm64_sonoma:  "bfa69cce988ac651b739c71906779096ab564f60053ad287e7820c087def59f0"
+    sha256 cellar: :any_skip_relocation, sonoma:        "8773f76ebce989ae0411672c3319aee172ff843543fefc1cf3ad7fa8d5af651b"
+    sha256                               arm64_linux:   "3315a5b1ea832435a83c2615ce747c48c15269de637b97b7aca618314fdda10e"
+    sha256                               x86_64_linux:  "4b32ee3b98a5f75025e5837c64a48e6c6bdd664c92fc6496ef7d3ad3edea698b"
+  end
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  def install
+    inreplace "src/lib/usefulstuff.c", "ext/standard/php_lcg.h", "ext/random/php_random.h"
+    safe_phpize
+    system "./configure", "--prefix=#{prefix}", phpconfig, "--enable-xdebug"
+    system "make"
+    prefix.install "modules/#{extension}.so"
+    write_config_file
+  end
+end
+```
+
+<Info>
+  The `livecheck` block tells `brew livecheck` where to find the latest release version. Use `strategy :github_latest` for GitHub releases, or provide a custom `url` and `regex` for PECL extensions (see `memcached@8.4.rb` for a PECL livecheck example).
+</Info>

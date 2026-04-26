@@ -1,0 +1,103 @@
+---
+title: "Installing PHP extensions with Homebrew"
+description: "Add the shivammathur/extensions tap and install any of 60+ pre-built PHP extensions for PHP 5.6 through 8.6 with a single brew install command."
+---
+
+Before installing an extension, make sure Homebrew is up to date and that the PHP version you want to target is already installed. This tap works with PHP from both the `shivammathur/php` tap and the `homebrew/core` tap.
+
+## Prerequisites
+
+<Steps>
+  <Step title="Update Homebrew">
+    Pull the latest formula definitions to avoid installing stale versions:
+
+    ```zsh
+    brew update
+    ```
+  </Step>
+  <Step title="Check your PHP version">
+    Confirm PHP is installed and note the version number:
+
+    ```zsh
+    php -v
+    ```
+  </Step>
+  <Step title="Install PHP if needed">
+    If PHP is not installed, add the `shivammathur/php` tap and install the version you need. For PHP 8.4:
+
+    ```zsh
+    brew tap shivammathur/php
+    brew install shivammathur/php/php@8.4
+    brew link --force --overwrite shivammathur/php/php@8.4
+    ```
+
+    <Tip>
+      See the [shivammathur/php](https://github.com/shivammathur/homebrew-php) tap for the full list of available PHP versions and installation options.
+    </Tip>
+  </Step>
+</Steps>
+
+## Add the tap
+
+Register the `shivammathur/extensions` tap with Homebrew so it can locate the extension formulae:
+
+```zsh
+brew tap shivammathur/extensions
+```
+
+You only need to do this once. After the tap is added, all its formulae are available to `brew install`.
+
+## Install an extension
+
+Every formula follows the naming pattern `<extension>@<php-version>`. Pass the full tap-qualified name to avoid ambiguity:
+
+```zsh
+brew install shivammathur/extensions/<extension>@<php-version>
+```
+
+### Examples
+
+<CodeGroup>
+
+```zsh Xdebug on PHP 8.4
+brew install shivammathur/extensions/xdebug@8.4
+```
+
+```zsh Redis (phpredis) on PHP 8.4
+brew install shivammathur/extensions/redis@8.4
+```
+
+```zsh Imagick on PHP 8.4
+brew install shivammathur/extensions/imagick@8.4
+```
+
+</CodeGroup>
+
+<Note>
+  The `redis@` formulae are aliases for `phpredis@`. When you install `redis@8.4`, Homebrew installs the [phpredis](https://github.com/phpredis/phpredis) extension. The formula name displayed after installation will show `phpredis@8.4`.
+</Note>
+
+## Verify the installation
+
+After installation, the tap automatically writes an INI configuration file to PHP's `conf.d` directory. Confirm the extension is loaded:
+
+```zsh
+php -m
+```
+
+Look for the extension name in the output. For Xdebug the entry appears in the **Zend Modules** section; all other extensions appear under **PHP Modules**.
+
+You can also filter the output for a specific extension:
+
+```zsh
+php -m | grep xdebug
+```
+
+<CardGroup cols={2}>
+  <Card title="Extension configuration" icon="file-lines" href="/usage/configuring-extensions">
+    Learn how INI files are written and how to customise extension settings.
+  </Card>
+  <Card title="Webserver setup" icon="server" href="/usage/webserver-setup">
+    Restart Apache or Nginx so PHP-FPM picks up the new extension.
+  </Card>
+</CardGroup>

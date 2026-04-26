@@ -1,0 +1,125 @@
+---
+title: "Adding a new PHP extension formula"
+description: "Walk through generating versioned formula files with gen.sh, verifying the output, and submitting a pull request for a new PHP extension."
+---
+
+Every extension in this tap ships one formula file per supported PHP version — for example `xdebug@8.4.rb`, `xdebug@8.3.rb`, and so on. Rather than writing those files by hand, you use the `gen.sh` script to stamp them out from a shared stub template. The script substitutes the extension name, repository URL, branch, license, and source type into the stub and then fetches the current release URL and checksum automatically.
+
+## The gen.sh script
+
+The script lives at `.github/scripts/gen.sh` and accepts the following positional arguments:
+
+```bash
+.github/scripts/gen.sh <extension> <repo> <branch> <license> <type> <versions...>
+```
+
+| Argument | Description |
+| --- | --- |
+| `extension` | Lowercase extension name, e.g. `xdebug` |
+| `repo` | GitHub repository path, e.g. `xdebug/xdebug` |
+| `branch` | Default branch for `head`, e.g. `master` |
+| `license` | SPDX license identifier, e.g. `PHP-3.0`. Use `no` when the license cannot be represented. |
+| `type` | Source layout — see the table below |
+| `versions...` | One or more PHP version strings, e.g. `8.4 8.3 8.2` |
+
+The `type` argument controls how the build changes into the correct source directory before running `phpize`:
+
+| Value | Meaning | Generated `Dir.chdir` call |
+| --- | --- | --- |
+| `pecl` | PECL tarball (source is in a versioned subdirectory) | `Dir.chdir "extension-#{version}"` |
+| `php` | Extension bundled inside the PHP source tree | `Dir.chdir "ext/#{extension}"` |
+| *(blank)* | Standalone repository with no subdirectory | Line is removed entirely |
+
+## Adding a new extension
+
+<Steps>
+  <Step title="Add an entry to autobump.txt">
+    The autobump workflow reads `autobump.txt` to know which formulae to keep updated. Add a line for each versioned formula you are introducing, following the existing format in that file.
+  </Step>
+
+  <Step title="Run gen.sh with the correct arguments">
+    From the repository root, run `gen.sh` for every PHP version you want to support. For example, to add a hypothetical `myext` extension hosted at `vendor/myext` for PHP 8.4 and 8.3:
+
+    ```bash
+    .github/scripts/gen.sh myext vendor/myext main MIT pecl 8.4 8.3
+    ```
+
+    The script performs these actions for each version:
+    1. Copies `extension.rb.stub` to `Formula/myext@<version>.rb`
+    2. Substitutes all template placeholders with real values
+    3. Calls `update.sh` to fetch the latest release URL
+    4. Downloads the tarball and computes the SHA-256 checksum
+  </Step>
+
+  <Step title="Review the generated formula files">
+    Open the generated files and confirm that:
+    - The class name follows the `MyextAT84 < AbstractPhpExtension` pattern
+    - The `url` points to a reachable release tarball
+    - The `sha256` is present and non-empty
+    - The `license` field is correct
+    - The `Dir.chdir` line (if any) matches the actual source layout
+
+    The stub template that `gen.sh` starts from looks like this:
+
+    ```ruby
+    # typed: false
+    # frozen_string_literal: true
+
+    require File.expand_path("../Abstract/abstract-php-extension", __dir__)
+
+    # Class for Extension_Title Extension
+    class Extension_TitleATNODOT < AbstractPhpExtension
+      init
+      desc "Extension_Title PHP extension"
+      homepage "https://github.com/REPO"
+      url "URL"
+      sha256 "SHA"
+      head "https://github.com/REPO.git", branch: "REPO_BRANCH"
+      license "LICENSE_NAME"
+
+      bottle do
+        root_url "https://ghcr.io/v2/shivammathur/extensions"
+      end
+
+      def install
+        CHDIR
+        safe_phpize
+        system "./configure", "--prefix=#{prefix}", phpconfig, "--enable-extension"
+        system "make"
+        prefix.install "modules/#{extension}.so"
+        write_config_file
+        add_include_files
+      end
+    end
+    ```
+  </Step>
+
+  <Step title="Run the style check">
+    Verify that the generated files pass Homebrew's linter:
+
+    ```bash
+    brew style .
+    ```
+
+    Correct any offences before continuing. Common issues include trailing whitespace and lines exceeding the 120-character limit.
+  </Step>
+
+  <Step title="Test the formula locally">
+    Build from source and run the built-in test for each generated formula:
+
+    ```bash
+    brew install --build-from-source shivammathur/extensions/myext@8.4
+    brew test shivammathur/extensions/myext@8.4
+    ```
+
+    The `test` block in `AbstractPhpExtension` runs `php -m` and asserts that the extension name appears in the output.
+  </Step>
+
+  <Step title="Submit a pull request">
+    Commit the new formula files and your `autobump.txt` changes, push to your fork, and open a pull request. Describe the extension, its upstream repository, and which PHP versions you have tested against.
+  </Step>
+</Steps>
+
+<Tip>
+  If the extension has non-trivial build requirements (extra `depends_on` entries, header symlinking, patching), study a comparable formula such as `memcached@8.4.rb` before customising the generated file.
+</Tip>

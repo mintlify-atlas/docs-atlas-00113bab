@@ -1,0 +1,106 @@
+---
+title: "Framework and async PHP extensions"
+description: "Install Phalcon, Swoole, Swow, ds, scalar_objects, and v8js for async PHP runtimes and C-level framework acceleration across PHP 5.6 to 8.6."
+---
+
+Several PHP extensions provide entire application frameworks or asynchronous runtime environments at the C level. These extensions replace or augment PHP's standard request lifecycle with coroutine schedulers, event loops, and pre-compiled framework internals, enabling throughput far beyond what is achievable with traditional PHP-FPM setups.
+
+## Phalcon
+
+Phalcon is a full-stack PHP framework delivered as a compiled C extension. Because the framework code runs natively rather than being interpreted on every request, Phalcon has historically benchmarked faster than pure-PHP frameworks. Three versions are available in this tap to match different PHP generation requirements.
+
+### phalcon3
+
+Phalcon 3.x, compatible with older PHP versions.
+
+**PHP version range:** PHP 5.6 to PHP 7.3
+
+```zsh
+brew install shivammathur/extensions/phalcon3@7.3
+```
+
+### phalcon4
+
+Phalcon 4.x, which introduced namespace reorganization and PSR compatibility.
+
+**PHP version range:** PHP 7.2 to PHP 7.4
+
+```zsh
+brew install shivammathur/extensions/phalcon4@7.4
+```
+
+### phalcon5
+
+Phalcon 5.x, the current stable release with PHP 8 support.
+
+**PHP version range:** PHP 7.4 to PHP 8.4
+
+```zsh
+brew install shivammathur/extensions/phalcon5@8.4
+```
+
+<Warning>
+  Phalcon requires specific PHP versions. Check which Phalcon version corresponds to your PHP version before installing. Running `phalcon5` on PHP 8.5 or later is not supported.
+</Warning>
+
+## swoole
+
+Swoole is an asynchronous networking framework for PHP built on top of coroutines, an event loop, and a built-in HTTP/WebSocket server. It enables PHP to handle thousands of concurrent connections in a long-lived process without PHP-FPM, significantly reducing per-request overhead. The formula in this tap is built with HTTP/2, MySQL, PostgreSQL, SQLite, brotli, zstd, and OpenSSL support enabled.
+
+**PHP version range:** PHP 5.6 to PHP 8.5
+
+```zsh
+brew install shivammathur/extensions/swoole@8.4
+```
+
+<Note>
+  Swoole conflicts with Swow — both provide coroutine networking runtimes and cannot be loaded together. Install only one per PHP version.
+</Note>
+
+<Tip>
+  When using Swoole's built-in HTTP server, you do not need Apache or Nginx as a front-end process. Use `brew services restart httpd` or `brew services restart nginx` only if you are still running Swoole behind a traditional web server for TLS termination or static asset serving.
+</Tip>
+
+## swow
+
+Swow is a newer coroutine networking engine for PHP that takes a different design approach from Swoole. It focuses on a pure-C coroutine scheduler with minimal overhead, clean PHP 8 semantics, and compatibility with the standard PHP exception model. It supports HTTP, WebSocket, and raw TCP/UDP servers.
+
+**PHP version range:** PHP 8.0 to PHP 8.5
+
+```zsh
+brew install shivammathur/extensions/swow@8.4
+```
+
+## ds
+
+The ds extension provides efficient data structure implementations — including `Vector`, `Map`, `Set`, `Stack`, `Queue`, `Deque`, and `PriorityQueue` — as alternatives to PHP's general-purpose `array`. These structures have stricter semantics and better performance characteristics for their intended access patterns.
+
+**PHP version range:** PHP 7.0 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/ds@8.4
+```
+
+## scalar_objects
+
+The scalar_objects extension allows methods to be registered on PHP scalar types (strings, integers, arrays, etc.), so that calls like `$str->toUpper()` are dispatched to a registered handler class. It is primarily used for language experimentation and developer experience tooling.
+
+**PHP version range:** PHP 7.0 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/scalar_objects@8.4
+```
+
+## v8js
+
+The v8js extension embeds the [V8 JavaScript engine](https://v8.dev/) into PHP, allowing PHP code to execute JavaScript snippets and exchange values between the two runtimes. It is useful for server-side rendering of JavaScript frameworks and sandboxed script evaluation.
+
+**PHP version range:** PHP 7.0 to PHP 8.6
+
+```zsh
+brew install shivammathur/extensions/v8js@8.4
+```
+
+<Info>
+  v8js requires the V8 library to be present on your system. On macOS, you can install it via Homebrew. The formula will use the V8 prefix detected at build time, so ensure `v8` is installed before building from source.
+</Info>

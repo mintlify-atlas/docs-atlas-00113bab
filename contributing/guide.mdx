@@ -1,0 +1,70 @@
+---
+title: "Contributing to homebrew-extensions"
+description: "Learn how to fork the repository, make your change, run Homebrew style checks, test locally, and open a pull request to the homebrew-extensions tap."
+---
+
+Contributions to homebrew-extensions are welcome from anyone — whether you are fixing a broken formula, adding a missing extension, or improving the build logic. Before you start, please read the [Contributor Code of Conduct](https://github.com/shivammathur/homebrew-extensions/blob/main/.github/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+## Contribution workflow
+
+<Steps>
+  <Step title="Fork and clone the repository">
+    Fork the project on GitHub, then clone your fork locally:
+
+    ```bash
+    git clone https://github.com/shivammathur/homebrew-extensions.git
+    cd homebrew-extensions
+    ```
+
+    <Note>
+      Make sure you have [configured your Git user name and email](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup) before committing. Strings like `silly nick name <root@localhost>` look out of place in the project history.
+    </Note>
+  </Step>
+
+  <Step title="Make your change">
+    Edit an existing formula or add a new one. To open a formula in your configured editor, use:
+
+    ```bash
+    brew edit <formula>
+    ```
+
+    For example, to edit the xdebug formula for PHP 8.4:
+
+    ```bash
+    brew edit shivammathur/extensions/xdebug@8.4
+    ```
+  </Step>
+
+  <Step title="Check style guidelines">
+    All formulae must pass Homebrew's style linter before review. Run it from the repository root:
+
+    ```bash
+    brew style .
+    ```
+
+    Fix any reported offences before moving on. The linter enforces Ruby style rules (via RuboCop) as well as Homebrew-specific conventions.
+  </Step>
+
+  <Step title="Test your change">
+    Install the formula locally and verify it works:
+
+    ```bash
+    brew install --build-from-source shivammathur/extensions/<formula>
+    brew test shivammathur/extensions/<formula>
+    ```
+
+    Run `php -m` with the correct PHP version to confirm the extension appears in the loaded module list.
+  </Step>
+
+  <Step title="Submit a pull request">
+    Push your branch to your fork and open a pull request against the main branch. Include all relevant details: what you changed, why, and how you tested it. Due to time constraints, responses may not always be immediate — feel free to follow up if you have not heard back.
+  </Step>
+</Steps>
+
+## Reporting issues
+
+If you find a bug or want to request support for a new extension, open an issue using the appropriate template on GitHub:
+
+<Card title="GitHub Issues" icon="circle-dot" href="https://github.com/shivammathur/homebrew-extensions/issues">
+  Report bugs, request new extensions, or ask questions about existing formulae.
+</Card>

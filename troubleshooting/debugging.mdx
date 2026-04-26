@@ -1,0 +1,82 @@
+---
+title: "Debugging PHP extension installation issues"
+description: "A step-by-step process for diagnosing and resolving problems when installing PHP extensions from the shivammathur/extensions Homebrew tap."
+---
+
+When a PHP extension fails to install or does not load as expected, the issue is almost always caused by a stale Homebrew index, incorrect permissions, or a misconfigured INI file. Work through the steps below in order — most problems are resolved by step three.
+
+<Warning>
+  Always run `brew update` before attempting to install or reinstall an extension. Installing against a stale formula index is the most common cause of failures and build errors.
+</Warning>
+
+<Steps>
+  <Step title="Update Homebrew">
+    Refresh the formula index so you are working with the latest package definitions and bottle manifests.
+
+    ```zsh
+    brew update
+    ```
+  </Step>
+
+  <Step title="Run brew doctor">
+    Check your Homebrew environment for known configuration problems and follow the instructions it prints to resolve any warnings.
+
+    ```zsh
+    brew doctor
+    ```
+
+    Unresolved warnings — such as stale symlinks, unexpected files in the Cellar, or conflicting paths — can cause extension builds to fail even when the formula itself is correct.
+  </Step>
+
+  <Step title="Fix Homebrew permissions">
+    If Homebrew files are owned by root or another user, installs and upgrades will fail with permission errors. Restore ownership to your current user account:
+
+    ```zsh
+    sudo chown -R "$(id -un)":"$(id -gn)" $(brew --prefix)
+    ```
+
+    After running this command, retry your original install command without `sudo`.
+  </Step>
+
+  <Step title="Verify the extension loads in PHP">
+    After a successful install, confirm that PHP can see the extension:
+
+    ```zsh
+    php -m
+    ```
+
+    The extension name should appear in the output. The formula's caveats also recommend this check — it is the canonical way to validate that the `.so` file was found and loaded correctly.
+  </Step>
+
+  <Step title="Locate active INI files">
+    If the extension does not appear in `php -m`, find out which configuration files PHP is reading:
+
+    ```zsh
+    php --ini
+    ```
+
+    The output shows the main `php.ini` path and the scan directory where additional `.ini` files are loaded. Note the scan directory path for the next step.
+  </Step>
+
+  <Step title="Inspect the conf.d directory">
+    Each installed extension writes an INI file into the PHP scan directory. List the files present for your PHP version (replace `<version>` with the version number, e.g. `8.4`):
+
+    ```zsh
+    ls /etc/php/<version>/conf.d/
+    ```
+
+    You should see a file named after the extension, such as `20-xdebug.ini`. If the file is missing or contains a wrong path to the `.so` file, the extension will not load. The file is written during install by the formula's `write_config_file` method, which places it at `$(brew --prefix)/etc/php/<version>/conf.d/<priority>-<extension>.ini`.
+  </Step>
+
+  <Step title="Check Homebrew's common issues page">
+    If your issue persists, review the upstream Homebrew documentation for common installation problems and their resolutions:
+
+    [https://docs.brew.sh/Common-Issues](https://docs.brew.sh/Common-Issues)
+  </Step>
+
+  <Step title="Open a GitHub Discussions thread">
+    If none of the steps above resolve your problem, create a thread in the project's Discussions forum and include the output from `brew doctor`, `php --ini`, and the full install log:
+
+    [https://github.com/shivammathur/homebrew-extensions/discussions](https://github.com/shivammathur/homebrew-extensions/discussions)
+  </Step>
+</Steps>

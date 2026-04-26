@@ -1,0 +1,122 @@
+---
+title: "Common issues with PHP extension installation"
+description: "Solutions to the most frequently reported problems when installing or loading PHP extensions from the shivammathur/extensions Homebrew tap."
+---
+
+The issues below cover the most frequent problems reported when using this tap. Each section describes what causes the problem and the steps you can take to fix it. If your issue is not listed here, see the [debugging guide](/troubleshooting/debugging) for a systematic diagnostic process.
+
+<AccordionGroup>
+  <Accordion title="Extension not found in php -m output">
+    After installing an extension, running `php -m` does not list it.
+
+    **Check the active PHP version.** The formula you installed must match the PHP version that is currently active on your path:
+
+    ```zsh
+    php -v
+    ```
+
+    If the version does not match, link the correct version first (see the "Wrong PHP version being used" section below).
+
+    **Verify the INI file was created.** The extension is loaded via an INI file written to the PHP scan directory during install. Check that the file exists:
+
+    ```zsh
+    php --ini
+    ```
+
+    Note the "Scan for additional .ini files in" path, then list that directory to confirm an INI file for your extension is present.
+
+    **Check the extension path inside the INI file.** Open the INI file and confirm that the `extension=` or `zend_extension=` line points to an existing `.so` file. If the path is wrong or the file has been removed, reinstall the extension:
+
+    ```zsh
+    brew reinstall shivammathur/extensions/<extension>@<version>
+    ```
+  </Accordion>
+
+  <Accordion title="Permission errors during installation">
+    Homebrew reports errors such as `Permission denied` or `Operation not permitted` when installing or upgrading an extension.
+
+    Homebrew should never be run with `sudo`. Instead, fix the ownership of the Homebrew prefix so that your user account has full access:
+
+    ```zsh
+    sudo chown -R "$(id -un)":"$(id -gn)" $(brew --prefix)
+    ```
+
+    After running this command, retry the install without `sudo`:
+
+    ```zsh
+    brew install shivammathur/extensions/<extension>@<version>
+    ```
+  </Accordion>
+
+  <Accordion title="No bottle available — compiling from source">
+    The install takes much longer than expected, or Homebrew reports that no pre-built bottle is available for your platform.
+
+    This tap provides pre-built bottles for Linux (`x86_64`), macOS Sonoma, macOS Sequoia, and macOS Tahoe (both `x86_64` and `arm64`). If you are on an older macOS release or an unsupported architecture, Homebrew will fall back to compiling the extension from source automatically. This is expected behaviour and not an error.
+
+    Source compilation can take several minutes depending on the extension and your machine. Let it run to completion. If the build fails during compilation, check the output for missing dependencies and install them before retrying.
+  </Accordion>
+
+  <Accordion title="Wrong PHP version being used">
+    Running `php -v` shows a different PHP version than the one you installed the extension for, or the `php` binary resolves to a system PHP rather than the Homebrew-managed version.
+
+    Check which binary is on your path:
+
+    ```zsh
+    which php
+    php -v
+    ```
+
+    To switch to a specific Homebrew PHP version and make it the default on your path, use `brew link`:
+
+    ```zsh
+    brew link --force --overwrite shivammathur/php/php@8.4
+    ```
+
+    Replace `8.4` with the PHP version you want to activate. After linking, open a new shell session and verify with `php -v`.
+  </Accordion>
+
+  <Accordion title="Extension conflicts or multiple INI files">
+    PHP loads an extension twice, you see warnings about duplicate symbols, or two INI files for the same extension exist in the scan directory.
+
+    This can happen when you upgrade an extension, install a different version, or previously used a different tap for the same extension. The formula's install step cleans up existing INI files for the extension before writing a new one, but files from unrelated installs are left in place.
+
+    Locate the scan directory with `php --ini`, then list its contents and remove any stale INI files for the affected extension:
+
+    ```zsh
+    ls $(brew --prefix)/etc/php/<version>/conf.d/
+    rm $(brew --prefix)/etc/php/<version>/conf.d/<old-ini-file>.ini
+    ```
+
+    Restart your PHP process or web server after removing duplicate files.
+  </Accordion>
+
+  <Accordion title="Web server not loading the new extension">
+    You can see the extension in `php -m` from the command line, but your application running under Apache or Nginx does not recognise it.
+
+    The command-line PHP and the PHP process managed by your web server are separate. You must restart the web server after installing or upgrading any extension for the change to take effect.
+
+    For Apache:
+
+    ```zsh
+    brew services restart httpd
+    ```
+
+    For Nginx with php-fpm:
+
+    ```zsh
+    brew services restart nginx
+    ```
+  </Accordion>
+
+  <Accordion title="redis@x.x formula not found">
+    Running `brew install shivammathur/extensions/redis@<version>` returns a "No available formula" error.
+
+    The `redis` formulae in this tap were renamed to `phpredis` to avoid conflicts with the standalone Redis server formula. Use `phpredis@<version>` instead:
+
+    ```zsh
+    brew install shivammathur/extensions/phpredis@8.4
+    ```
+
+    The full rename mapping is recorded in [`formula_renames.json`](https://github.com/shivammathur/homebrew-extensions/blob/main/formula_renames.json) in the repository root. Every version from PHP 5.6 through PHP 8.6 has a corresponding `phpredis@<version>` entry.
+  </Accordion>
+</AccordionGroup>

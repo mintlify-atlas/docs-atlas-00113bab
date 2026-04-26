@@ -1,0 +1,90 @@
+---
+title: "Caching PHP extensions: APCu, Memcache, Redis"
+description: "Install and configure APCu, Memcache, Memcached, and phpredis for PHP 5.6 through 8.6 using the shivammathur/extensions Homebrew tap on macOS and Linux."
+---
+
+In-process and distributed caching can dramatically reduce application latency. The `shivammathur/extensions` tap ships pre-built bottles for four widely used PHP caching extensions—APCu for shared-memory caching within a single PHP process, Memcache and Memcached for the Memcached server protocol, and phpredis for Redis. All four are available for PHP 5.6 through 8.6.
+
+## Prerequisites
+
+Add the tap once and make sure the target PHP version is already installed before running any install command below:
+
+```zsh
+brew update
+brew tap shivammathur/extensions
+```
+
+## Extensions
+
+<AccordionGroup>
+
+  <Accordion title="APCu — in-process user cache">
+    APCu (APC User Cache) stores arbitrary PHP values in shared memory local to the PHP process. It is the successor to the user-cache portion of APC and requires no external server.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/apcu@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting (e.g. `7.4`, `8.1`, `8.3`).
+
+    <Note>
+      APCu is a per-process cache. Data is not shared across PHP-FPM workers or separate CLI processes.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Memcache — lightweight Memcached client">
+    The `memcache` extension is a compact, pure-PHP-API client for the Memcached server that communicates over the original text protocol. It has no external library dependency beyond a running Memcached instance.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/memcache@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+  </Accordion>
+
+  <Accordion title="Memcached — full-featured Memcached client">
+    The `memcached` extension is built on top of `libmemcached` and provides a richer feature set than `memcache`, including consistent hashing, binary protocol support, SASL authentication, and serialisation via igbinary or msgpack. The formula depends on `libmemcached`, `igbinary`, and `msgpack`.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/memcached@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+
+    <Note>
+      The `memcached` formula pulls in `igbinary` and `msgpack` automatically as dependencies when installed through Homebrew.
+    </Note>
+  </Accordion>
+
+  <Accordion title="phpredis — Redis client (formula name: phpredis)">
+    The `phpredis` extension is the official Redis client for PHP, supporting all Redis data types, pipelining, Lua scripting, clustering, and Sentinel. It is compiled with igbinary, msgpack, lz4, lzf, and zstd support for efficient serialisation and compression.
+
+    **PHP version range:** PHP 5.6 to PHP 8.6
+
+    ```zsh
+    brew install shivammathur/extensions/phpredis@8.4
+    ```
+
+    Replace `8.4` with the PHP version you are targeting.
+
+    <Warning>
+      The formula name is `phpredis`, not `redis`. The `redis` entry in the tap README is an alias that maps to the same formula. Always use `phpredis` in install commands to avoid ambiguity with the `redis` server formula in homebrew/core.
+    </Warning>
+  </Accordion>
+
+</AccordionGroup>
+
+## Upgrading
+
+To upgrade a caching extension to the latest bottle for your PHP version, use `brew upgrade`:
+
+```zsh
+brew upgrade shivammathur/extensions/apcu@8.4
+brew upgrade shivammathur/extensions/phpredis@8.4
+```

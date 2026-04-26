@@ -1,0 +1,99 @@
+---
+title: "Extension configuration and INI files"
+description: "Understand how the tap writes PHP INI configuration files automatically, where they live, and how to customise extension settings for your environment."
+---
+
+When you install an extension with this tap, the formula automatically creates an INI configuration file in PHP's `conf.d` scan directory. You do not need to edit `php.ini` manually — PHP reads all files in `conf.d` on startup, so the extension is enabled as soon as the file is written.
+
+## Where INI files are stored
+
+Configuration files are placed at:
+
+```
+/etc/php/<php-version>/conf.d/<priority>-<extension>.ini
+```
+
+For example, the Xdebug configuration for PHP 8.4 is written to:
+
+```
+/etc/php/8.4/conf.d/20-xdebug.ini
+```
+
+The `<priority>` prefix controls load order. Most extensions use the default priority of `20`. Some extensions that depend on others (such as `memcached`, which depends on `igbinary` and `msgpack`) use a higher priority — `30` — so their dependencies are loaded first.
+
+## INI file format
+
+Each generated file follows this structure:
+
+```ini
+[<extension>]
+extension="/path/to/extension.so"
+```
+
+For most extensions the directive is `extension`. Xdebug is a special case: because it is a Zend extension, its directive is `zend_extension` instead:
+
+```ini
+[xdebug]
+zend_extension="/path/to/xdebug.so"
+```
+
+<Info>
+  Using `zend_extension` for Xdebug is required by PHP. Loading a Zend extension with the plain `extension` directive causes PHP to fail at startup.
+</Info>
+
+## Verify the configuration
+
+### Check loaded extensions
+
+List all extensions PHP currently has loaded:
+
+```zsh
+php -m
+```
+
+Extensions loaded via `zend_extension` (such as Xdebug) appear in the **Zend Modules** section. All others appear under **PHP Modules**.
+
+### Check active INI files
+
+See which configuration files PHP is reading, including the full path to the `conf.d` directory:
+
+```zsh
+php --ini
+```
+
+## Customising extension settings
+
+The generated INI file only enables the extension. To configure it further, edit the file directly. For example, to configure Xdebug's mode:
+
+```ini
+[xdebug]
+zend_extension="/path/to/xdebug.so"
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=127.0.0.1
+xdebug.client_port=9003
+```
+
+<Tip>
+  Avoid editing the auto-generated file directly if you prefer to keep your customisations separate. Instead, create an additional file in the same `conf.d` directory with a higher priority number (for example `21-xdebug-settings.ini`). PHP merges all INI files in load order, so the later file takes precedence.
+</Tip>
+
+<Warning>
+  Do not remove the generated INI file without also uninstalling the extension formula. If you reinstall or upgrade the formula, `write_config_file` will recreate it, overwriting any manual changes made to that specific file.
+</Warning>
+
+## Priority reference
+
+| Priority | When it applies |
+|----------|-----------------|
+| `20` | Default for most extensions |
+| `30` | Extensions that depend on other tap extensions (e.g., `memcached` depends on `igbinary` and `msgpack`) |
+
+<CardGroup cols={2}>
+  <Card title="Installing extensions" icon="download" href="/usage/installing-extensions">
+    Install an extension and let the tap write its INI file automatically.
+  </Card>
+  <Card title="Webserver setup" icon="server" href="/usage/webserver-setup">
+    Restart your webserver so PHP-FPM reloads the updated configuration.
+  </Card>
+</CardGroup>

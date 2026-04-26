@@ -1,0 +1,78 @@
+---
+title: "Restarting your webserver after extension changes"
+description: "PHP-FPM loads extensions at startup and caches them in memory. Restart your webserver or PHP-FPM process after installing or upgrading any extension."
+---
+
+When PHP runs through a webserver like Apache or Nginx, it uses PHP-FPM (FastCGI Process Manager) to handle requests. PHP-FPM loads extensions once when it starts and keeps them in memory, so installing or upgrading an extension has no effect on running requests until the process is restarted. CLI usage is different — running `php` directly in a terminal always reads from disk, so no restart is needed there.
+
+## Restart commands
+
+<Tabs>
+  <Tab title="Apache">
+    If you are running Apache (`httpd`) installed via Homebrew, restart it with:
+
+    ```zsh
+    brew services restart httpd
+    ```
+
+    This stops and starts the `httpd` service, which in turn restarts the PHP-FPM workers it manages.
+  </Tab>
+  <Tab title="Nginx">
+    If you are running Nginx installed via Homebrew, restart it with:
+
+    ```zsh
+    brew services restart nginx
+    ```
+
+    Make sure your Nginx configuration passes requests to the correct PHP-FPM socket or port for the PHP version you updated.
+  </Tab>
+  <Tab title="PHP-FPM directly">
+    If you manage PHP-FPM independently of your webserver, restart it by specifying the PHP version. Use the formula from whichever tap you installed PHP from:
+
+    ```zsh
+    # If PHP was installed from shivammathur/php
+    brew services restart shivammathur/php/php@8.4
+
+    # If PHP was installed from homebrew/core
+    brew services restart php@8.4
+    ```
+
+    Replace `8.4` with the PHP version whose extensions you updated.
+  </Tab>
+</Tabs>
+
+## Confirm the restart worked
+
+After restarting, verify that the extension is loaded by the web process. If your application has a PHP info endpoint, check it in a browser. Alternatively, run:
+
+```zsh
+php -m | grep <extension>
+```
+
+This checks the CLI SAPI; if you need to confirm the FPM SAPI specifically, call `phpinfo()` from a web request and look for the extension in the output.
+
+## CLI PHP does not need a restart
+
+When you run `php` directly in a terminal, each invocation is a new process that reads its configuration from disk. After installing or upgrading an extension you can use it immediately from the command line — no restart required.
+
+<Note>
+  If you have multiple PHP versions installed, make sure you restart the PHP-FPM service for the specific version whose extensions you changed. Restarting `php@8.4` has no effect on the `php@8.3` FPM pool.
+</Note>
+
+## When to restart
+
+Restart your webserver or PHP-FPM process whenever you:
+
+- Install a new extension with `brew install`
+- Upgrade an existing extension with `brew upgrade`
+- Edit an INI configuration file in `conf.d`
+- Remove an extension formula
+
+<CardGroup cols={2}>
+  <Card title="Installing extensions" icon="download" href="/usage/installing-extensions">
+    Install a new extension using brew install.
+  </Card>
+  <Card title="Upgrading extensions" icon="arrow-up-circle" href="/usage/upgrading-extensions">
+    Upgrade an extension to the latest available version.
+  </Card>
+</CardGroup>
